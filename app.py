@@ -30,6 +30,12 @@ def index():
 
     return render_template( 'index.html', segment='index.html' )
 
+@app.route('/sign_out')
+def sign_out():
+    
+    message = "assets/img/inventory.png"
+    return render_template( 'sign-in.html', message = message )
+
 # Data Tables pages
 @app.route('/datatables/', methods=['GET', 'POST'])
 def datatables():
