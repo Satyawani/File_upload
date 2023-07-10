@@ -1,0 +1,244 @@
+
+
+{% extends "layouts/base.html" %}
+
+{% block title %} Simple DataTables {% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}
+
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}
+
+<link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet" type="text/css">
+
+<!-- APP Style -->
+<link type="text/css" href="/static/datatables/app.css" rel="stylesheet">
+
+{% endblock stylesheets %}
+
+{% block content %}
+<table id="example" class="display" style="width:100%">
+        <thead>
+            <tr>
+                <th></th>
+                <th>Rule Name</th>
+                <th>From Date </th>
+                <th>To Date</th>
+                <th>Status</th>
+                <th>Details</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+    <tfoot>
+            <tr>
+                  <th>Rule ID</th>
+                <th>Rule Name</th>
+                <th>From Date </th>
+                <th>To Date</th>
+                <th>Status</th>
+                <th></th>
+                <th></th>
+
+            </tr>
+        </tfoot>
+    </table>
+
+    </div>
+  </div>
+
+      </div>
+  </div>
+            </div>
+        </div>
+    </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+<script>
+var data={{tble|safe}}
+
+    $(document).ready(function() {
+  $('#example tfoot th').each( function () {
+        var title = $(this).text();
+        $(this).html( '<input type="text" placeholder="Search '+title+'" />' );
+    } );
+    var exampleTable =$('#example').DataTable({
+    data:data,
+     "columnDefs": [
+                {
+                    className: "dt-body-center",
+                    targets: 5,
+                    defaultContent: ["<button class='editButton'  data-toggle='modal' data-target='#orderModal'> View</button>"]
+
+                },
+                {
+                    className: "dt-body-center",
+                   targets: 6,
+                   defaultContent: ["<button class='appr' id='appr'> Approved</button> <button id='reject'> Rejected</button>"]
+                }
+            ],
+
+            "createdRow": function( row, data, dataIndex ) {
+
+             if ( data[4] == "pending" ) {
+
+         $(row).find('td:eq(4)').css('color', 'red');
+
+       }
+
+
+    },
+     initComplete: function () {
+            // Apply the search
+            this.api().columns().every( function () {
+                var that = this;
+
+                $( 'input', this.footer() ).on( 'keyup change clear', function () {
+                    if ( that.search() !== this.value ) {
+                        that
+                            .search( this.value )
+                            .draw();
+                    }
+                } );
+            } );
+
+            var r = $('#example tfoot tr');
+  r.find('th').each(function(){
+    $(this).css('padding', 8);
+  });
+  $('#example thead').append(r);
+  $('#search_0').css('text-align', 'center');
+        }
+
+    } );
+    });
+
+</script>
+
+<script>
+  $(document).ready(function (){
+ $('#appr').on('click', function () {
+ console.log('hel')
+    var table =$('#example').DataTable();
+
+var data = table.row( $(this).parents('tr') ).data();
+console.log(data[4]);
+  var row= this.parentNode.parentNode;
+  alert(row.rowIndex);
+
+  var confirmalert = confirm("Are you sure?");
+  if (confirmalert == true) {
+     table.cell(row,4).data('Approved').draw();
+
+     new_item = table.cell(row,0).data() ;//value I want to send
+     $.ajax({
+         url: '/deletevalue',
+         type: 'POST',
+         traditional: "true",
+         data: {"data1":new_item},
+         dataType: "json"
+});
+}
+ });
+ });
+</script>
+
+<script>
+
+
+ $(function (){
+ console.log('hr')
+ $('#orderModal').modal({
+        keyboard: true,
+        backdrop: "static",
+        show:false,
+
+    }).on('show', function(){
+       console.log('hh')
+     var getIdFromRow = $(event.target).closest('tr').data();
+     console.log(getIdFromRow)
+       $(this).find('#orderDetails').html($('<b> Order Id selected: ' + getIdFromRow  + '</b>'))
+});
+});
+</script>
+
+<div id="orderModal" class="modal hide fade" role="dialog" aria-labelledby="orderModalLabel" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+         <h3>Order</h3>
+
+    </div>
+    <div id="orderDetails" class="modal-body"></div>
+    <div id="orderItems" class="modal-body"></div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+    </div>
+</div>
+
+
+
+<!-- Core -->
+<script src="https://appsrv1-147a1.kxcdn.com/volt-dashboard-v132/vendor/@popperjs/core/dist/umd/popper.min.js"></script>
+<script src="https://appsrv1-147a1.kxcdn.com/volt-dashboard-v132/vendor/bootstrap/dist/js/bootstrap.min.js"></script>
+
+<!-- Vendor JS -->
+<script src="https://appsrv1-147a1.kxcdn.com/volt-dashboard-v132/vendor/onscreen/dist/on-screen.umd.min.js"></script>
+
+<!-- Slider -->
+<script src="https://appsrv1-147a1.kxcdn.com/volt-dashboard-v132/vendor/nouislider/distribute/nouislider.min.js"></script>
+
+<!-- Smooth scroll -->
+<script src="https://appsrv1-147a1.kxcdn.com/volt-dashboard-v132/vendor/smooth-scroll/dist/smooth-scroll.polyfills.min.js"></script>
+
+<!-- Charts -->
+<script src="https://appsrv1-147a1.kxcdn.com/volt-dashboard-v132/vendor/chartist/dist/chartist.min.js"></script>
+<script src="https://appsrv1-147a1.kxcdn.com/volt-dashboard-v132/vendor/chartist-plugin-tooltips/dist/chartist-plugin-tooltip.min.js"></script>
+
+<!-- Datepicker -->
+<script src="https://appsrv1-147a1.kxcdn.com/volt-dashboard-v132/vendor/vanillajs-datepicker/dist/js/datepicker.min.js"></script>
+
+<!-- Sweet Alerts 2 -->
+<script src="https://appsrv1-147a1.kxcdn.com/volt-dashboard-v132/vendor/sweetalert2/dist/sweetalert2.all.min.js"></script>
+
+<!-- Moment JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.27.0/moment.min.js"></script>
+
+<!-- Vanilla JS Datepicker -->
+<script src="https://appsrv1-147a1.kxcdn.com/volt-dashboard-v132/vendor/vanillajs-datepicker/dist/js/datepicker.min.js"></script>
+
+<!-- Notyf -->
+<script src="https://appsrv1-147a1.kxcdn.com/volt-dashboard-v132/vendor/notyf/notyf.min.js"></script>
+
+<!-- Simplebar -->
+<script src="https://appsrv1-147a1.kxcdn.com/volt-dashboard-v132/vendor/simplebar/dist/simplebar.min.js"></script>
+
+<!-- Github buttons -->
+<script async defer src="https://buttons.github.io/buttons.js"></script>
+
+<!-- Volt JS -->
+<script src="https://appsrv1-147a1.kxcdn.com/volt-dashboard-v132/js/volt.js"></script>
+
+
+              <!-- Required Js -->
+    <script src="https://appsrv1-147a1.kxcdn.com/dattaable/js/vendor-all.min.js"></script>
+    <script src="https://appsrv1-147a1.kxcdn.com/dattaable/plugins/bootstrap/js/bootstrap.min.js"></script>
+    <script src="https://appsrv1-147a1.kxcdn.com/dattaable/js/pcoded.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css"></script>
+<script src="//cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+<script src="//cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css"></script>
+
