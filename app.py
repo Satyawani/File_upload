@@ -27,7 +27,9 @@ app.config['SECRET_KEY'] = 'Super_s3cret777'
 @app.route('/')
 def index():
 
-    return render_template('index.html', segment='index.html')
+    message = "static/assets/img/inventory.png"
+    return render_template('sign-in.html', message=message)
+
 
 
 @app.route('/sign_out')
@@ -38,7 +40,6 @@ def sign_out():
 
 # convert_file
 
-
 @app.route("/getconvert_fun")
 def getconvert_fun():
     data = request.args.to_dict()
@@ -46,8 +47,6 @@ def getconvert_fun():
 
 
 # Data Tables pages
-
-
 @app.route('/datatables/', methods=['GET', 'POST'])
 def datatables():
 
