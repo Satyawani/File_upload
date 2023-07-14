@@ -39,12 +39,11 @@ def sign_out():
 # convert_file
 
 
-@app.route("/getcovert_fun")
-def getcovert_fun():
-    # with open("outputs/Adjacency.csv") as fp:
-    #     csv = fp.read()
-    # convert_supp_item_count('samples\data.csv')
-    return render_template('convert_datatable.html', segment = 'convert_datatable.html')
+@app.route("/getconvert_fun")
+def getconvert_fun():
+    data = request.args.to_dict()
+    return render_template('convert_datatable.html', data=data)
+
 
 # Data Tables pages
 

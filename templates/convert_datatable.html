@@ -15,8 +15,8 @@
 
 <div class="card mt-4 justify-content-center text-center">
     <div class="card-body">
-        <table id="example" class="table mx-auto" style="width: 100%;">
-            <thead>
+        <table id="data-table" class="table mx-auto" style="width: 100%;">
+            <!-- <thead>
                 <tr>
                     <th>Br Code</th>
                     <th>Branch Name</th>
@@ -37,16 +37,134 @@
                     <td><input type="checkbox" name="" id=""></td>
                     <td><button class="btn btn-primary">Save & Approve</button></td>
                 </tr>
-            </tbody>
+            </tbody> -->
         </table>
+        <!-- <div id="data-container"></div> -->
+
     </div>
 </div>
 
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest"></script>
+
 <script>
-    var table = new simpleDatatables.DataTable("#example")
+    // var table = new simpleDatatables.DataTable("#example");
+        document.addEventListener("DOMContentLoaded", function () {
+            const data = {{ data| tojson | safe
+        }};
+
+        const transformedData = [];
+
+        Object.entries(data).forEach(([key, value]) => {
+            const rowIndex = parseInt(key.split("[")[1]);
+            const colIndex = parseInt(key.split("[")[2]);
+
+            if (!transformedData[rowIndex]) {
+                transformedData[rowIndex] = [];
+            }
+
+            transformedData[rowIndex][colIndex] = value;
+            console.log(transformedData);
+        });
+
+        const dataArray = transformedData.filter(Boolean);
+        console.log(dataArray);
+
+        const table = new simpleDatatables.DataTable("#data-table", {
+            data: {
+                headings: [
+                    "SI_Code",
+                    "BR_Code",
+                    "BR_Name",
+                    "Item",
+                    "Item_Name",
+                    "Order_Qty",
+                    "Supplier_Code",
+                    "Supplier_Name"
+                ],
+                data: dataArray
+            }
+        });
+    });
+
+
+//     document.addEventListener("DOMContentLoaded", function () {
+//         const dataContainer = document.getElementById("data-container");
+//         const data = {{ data| tojson | safe
+//     }};
+
+//     console.log(data);
+
+//     const transformedData = {};
+
+//     Object.entries(data).forEach(([key, value]) => {
+//         const rowIndex = parseInt(key.split("[")[1]);
+//         const colIndex = parseInt(key.split("[")[2]);
+
+//         if (!transformedData[rowIndex]) {
+//             transformedData[rowIndex] = {};
+//         }
+
+//         switch (colIndex) {
+//             case 0:
+//                 transformedData[rowIndex].SI_Code = value;
+//                 break;
+//             case 1:
+//                 transformedData[rowIndex].BR_Code = value;
+//                 break;
+//             case 2:
+//                 transformedData[rowIndex].BR_Name = value;
+//                 break;
+//             case 6:
+//                 transformedData[rowIndex].Supplier_Code = value;
+//                 break;
+//             case 7:
+//                 transformedData[rowIndex].Supplier_Name = value;
+//                 break;
+//             default:
+//                 break;
+//         }
+//     });
+
+//     const dataArray = Object.values(transformedData);
+//     const itemCounts = {};
+
+//     dataArray.forEach((row) => {
+//         const supplierCode = row.Supplier_Code;
+//         itemCounts[supplierCode] = (itemCounts[supplierCode] || 0) + 1;
+//     });
+
+//     const mappedDataArray = dataArray.map((row) => {
+//         const supplierCode = row.Supplier_Code;
+//         return [
+//             row.BR_Code,
+//             row.BR_Name,
+//             row.Supplier_Code,
+//             row.Supplier_Name,
+//             itemCounts[supplierCode],
+//             '<button>Save & Approve</button>'
+//         ];
+//     });
+
+//     const table = new simpleDatatables.DataTable("#data-table", {
+//         data: {
+//             headings: [
+//                 "BR_Code",
+//                 "BR_Name",
+//                 "Supplier_Code",
+//                 "Supplier_Name",
+//                 "Item_Count",
+//                 ""
+//             ],
+//             data: mappedDataArray
+//         }
+//     });
+// });
+
+
+
+
 </script>
 <!-- <script src="//cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
 
@@ -151,59 +269,3 @@
 </div> -->
 
 {% endblock content %}
-
-<!-- Core -->
-<script src="https://appsrv1-147a1.kxcdn.com/volt-dashboard-v132/vendor/@popperjs/core/dist/umd/popper.min.js"></script>
-<script src="https://appsrv1-147a1.kxcdn.com/volt-dashboard-v132/vendor/bootstrap/dist/js/bootstrap.min.js"></script>
-
-<!-- Vendor JS -->
-<script src="https://appsrv1-147a1.kxcdn.com/volt-dashboard-v132/vendor/onscreen/dist/on-screen.umd.min.js"></script>
-
-<!-- Slider -->
-<script
-    src="https://appsrv1-147a1.kxcdn.com/volt-dashboard-v132/vendor/nouislider/distribute/nouislider.min.js"></script>
-
-<!-- Smooth scroll -->
-<script
-    src="https://appsrv1-147a1.kxcdn.com/volt-dashboard-v132/vendor/smooth-scroll/dist/smooth-scroll.polyfills.min.js"></script>
-
-<!-- Charts -->
-<script src="https://appsrv1-147a1.kxcdn.com/volt-dashboard-v132/vendor/chartist/dist/chartist.min.js"></script>
-<script
-    src="https://appsrv1-147a1.kxcdn.com/volt-dashboard-v132/vendor/chartist-plugin-tooltips/dist/chartist-plugin-tooltip.min.js"></script>
-
-<!-- Datepicker -->
-<script
-    src="https://appsrv1-147a1.kxcdn.com/volt-dashboard-v132/vendor/vanillajs-datepicker/dist/js/datepicker.min.js"></script>
-
-<!-- Sweet Alerts 2 -->
-<script
-    src="https://appsrv1-147a1.kxcdn.com/volt-dashboard-v132/vendor/sweetalert2/dist/sweetalert2.all.min.js"></script>
-
-<!-- Moment JS -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.27.0/moment.min.js"></script>
-
-<!-- Vanilla JS Datepicker -->
-<script
-    src="https://appsrv1-147a1.kxcdn.com/volt-dashboard-v132/vendor/vanillajs-datepicker/dist/js/datepicker.min.js"></script>
-
-<!-- Notyf -->
-<script src="https://appsrv1-147a1.kxcdn.com/volt-dashboard-v132/vendor/notyf/notyf.min.js"></script>
-
-<!-- Simplebar -->
-<script src="https://appsrv1-147a1.kxcdn.com/volt-dashboard-v132/vendor/simplebar/dist/simplebar.min.js"></script>
-
-<!-- Github buttons -->
-<script async defer src="https://buttons.github.io/buttons.js"></script>
-
-<!-- Volt JS -->
-<script src="https://appsrv1-147a1.kxcdn.com/volt-dashboard-v132/js/volt.js"></script>
-
-
-<!-- Required Js -->
-<script src="https://appsrv1-147a1.kxcdn.com/dattaable/js/vendor-all.min.js"></script>
-<script src="https://appsrv1-147a1.kxcdn.com/dattaable/plugins/bootstrap/js/bootstrap.min.js"></script>
-<script src="https://appsrv1-147a1.kxcdn.com/dattaable/js/pcoded.min.js"></script>
-<script src="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css"></script>
-<script src="//cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
-<script src="//cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css"></script>
