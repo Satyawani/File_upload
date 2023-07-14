@@ -26,17 +26,43 @@ app.config['SECRET_KEY'] = 'Super_s3cret777'
 # Default Route
 @app.route('/')
 def index():
+    message = "static/assets/img/inventory.png"
+    return render_template('sign-in.html', message=message)
 
-    return render_template('index.html', segment='index.html')
+
+
+@app.route('/login', methods=['POST'])
+def admin12():
+    if request.method == 'POST':
+
+        uname = request.form.get('username')
+        passw = request.form.get('passwd')
+
+        print(uname,passw)
+        if uname == 'admin':
+
+            b=1
+            print('hello')
+
+            if b == 1:
+
+                return render_template('datatables.html')
+
+
+
+
+
+
 
 
 @app.route('/sign_out')
 def sign_out():
 
-    message = "assets/img/inventory.png"
+    message = "static/assets/img/inventory.png"
     return render_template('sign-in.html', message=message)
 
 # convert_file
+
 
 
 @app.route("/getcovert_fun")
@@ -49,7 +75,7 @@ def getcovert_fun():
 # Data Tables pages
 
 
-@app.route('/datatables/', methods=['GET', 'POST'])
+@app.route('/datatables/', methods=[ 'POST'])
 def datatables():
 
     # Page data used in POST & GET
