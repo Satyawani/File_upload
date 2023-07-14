@@ -83,6 +83,7 @@
             supplierCode,
             supplierName,
             itemCounts[supplierCode], // Update to use the item count
+            `<input type="checkbox" id="${supplierCode}">`,
             '<button class="btn btn-outline-gray-600 text-center">Save & Approve</button>'
         ];
     });
@@ -95,6 +96,7 @@
                 "Supplier_Code",
                 "Supplier_Name",
                 "Item_Count",
+                "Select",
                 ""
             ],
             data: mappedDataArray
