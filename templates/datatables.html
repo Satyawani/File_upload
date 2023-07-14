@@ -35,7 +35,7 @@
   </nav>
   <div class="d-flex justify-content-between w-100 flex-wrap">
     <div class="mb-3 mb-lg-0">
-      <h1 class="h4">Simple DataTables</h1>
+      <h1 class="h4">Central Purchase Order</h1>
       <p class="mb-0">
         The information is loaded from <strong>samples\{{ input }}</strong>.
 
@@ -45,7 +45,7 @@
     </div>
   </div>
 
-  <div class="row mt-4">
+  <div class="row mt-2">
     <div class="col-md-3">
       <select name="csv_file" id="csv_file" class="form-select csv_file">
         {% for f in csv_files %}
@@ -55,8 +55,17 @@
     </div>
     <div class="col-md-3">
       <div class="mb-3">
+                <form method="post" enctype="multipart/form-data" action="/datatables" accept=".csv">
+
+                  <input type="file" id="file" name="file">
+
+                  <button>Upload</button>
+
+
+                </form>
+
         <!-- <label for="fileInput" class="form-label">Default file input example</label> -->
-        <input class="form-control" type="file" id="fileInput">
+<!--        <input class="form-control" type="file" id="fileInput">-->
       </div>
     </div>
     <div class="col-md-3">
