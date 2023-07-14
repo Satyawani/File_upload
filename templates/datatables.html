@@ -138,8 +138,6 @@
       if (!data.length) {
         return
       }
-
-      console.log(typeof data);
       table = new simpleDatatables.DataTable("#api-datatable", {
         data: {
           headings: Object.keys(data[0]),
@@ -254,7 +252,8 @@
     });
 
     window.location.href = "/getconvert_fun?" + params.toString();
-    window.location.target = '_blank';
+    console.log(window.location.href);
+    // window.location.target = '_blank';
   });
 
 
