@@ -53,6 +53,12 @@ def admin12():
 
 
 
+<<<<<<< Updated upstream
+=======
+
+    message = "static/assets/img/inventory.png"
+    return render_template('sign-in.html', message=message)
+>>>>>>> Stashed changes
 
 
 @app.route('/sign_out')
