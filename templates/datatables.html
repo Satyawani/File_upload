@@ -46,31 +46,36 @@
   </div>
 
   <div class="row mt-2">
-    <div class="col-md-3">
+    <div class="col-md-2">
       <select name="csv_file" id="csv_file" class="form-select csv_file">
         {% for f in csv_files %}
         <option value="{{ f }}" {% if f==input %} selected {% endif %}>{{ f }}</option>
         {% endfor %}
       </select>
     </div>
-    <div class="col-md-3">
+    <div class="col-md-4">
       <div class="mb-3">
-                <form method="post" enctype="multipart/form-data" action="/datatables" accept=".csv">
+        <form method="post" enctype="multipart/form-data" action="/datatables" accept=".csv">
+          <div class="row">
+            <div class="col-md-8">
+              <input type="file" id="fileInput" class="form-control">
 
-                  <input type="file" id="file" name="file">
-
-                  <button>Upload</button>
-
-
-                </form>
+            </div>
+            <div class="col-md-4">
+              <div class="d-grid">
+                <button class="btn btn-primary">Upload</button>
+              </div>
+            </div>
+          </div>
+        </form>
 
         <!-- <label for="fileInput" class="form-label">Default file input example</label> -->
-<!--        <input class="form-control" type="file" id="fileInput">-->
+        <!--        <input class="form-control" type="file" id="fileInput">-->
       </div>
     </div>
     <div class="col-md-3">
       <div class="mb-4 mb-lg-0 d-grid">
-        <a target="_blank" href="/getcovert_fun" class="btn btn-outline-gray-600 text-center" id="convertBtn">
+        <a target="_blank" class="btn btn-outline-gray-600 text-center" id="convertBtn">
           <!-- <svg class="icon icon-xs me-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
             <path fill-rule="evenodd"
               d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z"
@@ -147,8 +152,6 @@
       if (!data.length) {
         return
       }
-
-      console.log(typeof data);
       table = new simpleDatatables.DataTable("#api-datatable", {
         data: {
           headings: Object.keys(data[0]),
@@ -157,7 +160,7 @@
       })
     })
 
-  
+
 
   // function handleConvertClick() {
   //   const fileInput = document.getElementById('fileInput');
@@ -182,7 +185,6 @@
 
     reader.onload = function (e) {
       const data = new Uint8Array(e.target.result);
-      // console.log(data);
       processData(data);
       // console.log('namsate')
     };
@@ -213,15 +215,6 @@
 
     table.destroy();
 
-    // table.init("#api-datatable", {
-    //   data: {
-    //     headings: Object.keys(transformedData[1]),
-    //     data: Object.values(transformedData)
-    //   },
-    // });
-
-
-
     const tableElement = document.querySelector("#api-datatable");
 
     tableElement.innerHTML = "";
@@ -251,11 +244,28 @@
     });
 
     tableElement.appendChild(tableBody);
+    // table = new simpleDatatables.DataTable("#api-datatable");
 
   }
 
   $('#fileInput').change(handleFileUpload);
-  // $('#convertBtn').click(handleConvertClick);
+
+
+  document.getElementById("convertBtn").addEventListener("click", function () {
+    const tableElement = document.getElementById("api-datatable");
+    const rows = tableElement.querySelectorAll("tbody tr");
+    const params = new URLSearchParams();
+    rows.forEach((row, index) => {
+      const cells = row.querySelectorAll("td");
+      cells.forEach((cell, cellIndex) => {
+        params.append(`data[${index}][${cellIndex}]`, cell.textContent);
+      });
+    });
+
+    const url = "/getconvert_fun?" + params.toString();
+    window.open(url, "_blank");
+  });
+
 
 
 </script>

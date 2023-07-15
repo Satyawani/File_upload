@@ -26,62 +26,28 @@ app.config['SECRET_KEY'] = 'Super_s3cret777'
 # Default Route
 @app.route('/')
 def index():
-    message = "static/assets/img/inventory.png"
-    return render_template('sign-in.html', message=message)
-
-
-
-@app.route('/login', methods=['POST'])
-def admin12():
-    if request.method == 'POST':
-
-        uname = request.form.get('username')
-        passw = request.form.get('passwd')
-
-        print(uname,passw)
-        if uname == 'admin':
-
-            b=1
-            print('hello')
-
-            if b == 1:
-
-                return render_template('datatables.html')
-
-
-
-
-
-
-<<<<<<< Updated upstream
-=======
 
     message = "static/assets/img/inventory.png"
     return render_template('sign-in.html', message=message)
->>>>>>> Stashed changes
+
 
 
 @app.route('/sign_out')
 def sign_out():
 
-    message = "static/assets/img/inventory.png"
+    message = "assets/img/inventory.png"
     return render_template('sign-in.html', message=message)
 
 # convert_file
 
+@app.route("/getconvert_fun")
+def getconvert_fun():
+    data = request.args.to_dict()
+    return render_template('convert_datatable.html', data=data)
 
-
-@app.route("/getcovert_fun")
-def getcovert_fun():
-    # with open("outputs/Adjacency.csv") as fp:
-    #     csv = fp.read()
-    # convert_supp_item_count('samples\data.csv')
-    return render_template('convert_datatable.html', segment = 'convert_datatable.html')
 
 # Data Tables pages
-
-
-@app.route('/datatables/', methods=[ 'POST'])
+@app.route('/datatables/', methods=['GET', 'POST'])
 def datatables():
 
     # Page data used in POST & GET
