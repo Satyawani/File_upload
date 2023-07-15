@@ -46,26 +46,31 @@
   </div>
 
   <div class="row mt-2">
-    <div class="col-md-3">
+    <div class="col-md-2">
       <select name="csv_file" id="csv_file" class="form-select csv_file">
         {% for f in csv_files %}
         <option value="{{ f }}" {% if f==input %} selected {% endif %}>{{ f }}</option>
         {% endfor %}
       </select>
     </div>
-    <div class="col-md-3">
+    <div class="col-md-4">
       <div class="mb-3">
-                <form method="post" enctype="multipart/form-data" action="/datatables" accept=".csv">
+        <form method="post" enctype="multipart/form-data" action="/datatables" accept=".csv">
+          <div class="row">
+            <div class="col-md-8">
+              <input type="file" id="fileInput" class="form-control">
 
-                  <input type="file" id="file" name="file">
-
-                  <button>Upload</button>
-
-
-                </form>
+            </div>
+            <div class="col-md-4">
+              <div class="d-grid">
+                <button class="btn btn-primary">Upload</button>
+              </div>
+            </div>
+          </div>
+        </form>
 
         <!-- <label for="fileInput" class="form-label">Default file input example</label> -->
-<!--        <input class="form-control" type="file" id="fileInput">-->
+        <!--        <input class="form-control" type="file" id="fileInput">-->
       </div>
     </div>
     <div class="col-md-3">
@@ -180,7 +185,6 @@
 
     reader.onload = function (e) {
       const data = new Uint8Array(e.target.result);
-      // console.log(data);
       processData(data);
       // console.log('namsate')
     };
@@ -195,7 +199,6 @@
     const realJsonData = JSON.stringify(jsonData);
     // console.log(realJsonData);
     const transformedData = {};
-    console.log(transformedData);
 
     for (let i = 2; i < jsonData.length; i++) {
       transformedData[i - 1] = {
@@ -257,12 +260,10 @@
       cells.forEach((cell, cellIndex) => {
         params.append(`data[${index}][${cellIndex}]`, cell.textContent);
       });
-      console.log(cells);
     });
 
-    window.location.href = "/getconvert_fun?" + params.toString();
-    console.log(window.location.href);
-    // window.location.target = '_blank';
+    const url = "/getconvert_fun?" + params.toString();
+    window.open(url, "_blank");
   });
 
 
