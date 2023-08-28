@@ -8,6 +8,35 @@
 <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous"> -->
 <!-- APP Style -->
+  <style>
+  #data-table td:nth-child(3),
+#data-table th:nth-child(3) {
+  display: none;
+}
+  #data-table td:nth-child(4),
+#data-table th:nth-child(4) {
+  display: none;
+}
+ #data-table td:nth-child(9),
+#data-table th:nth-child(9) {
+  display: none;
+}
+ #data-table td:nth-child(11),
+#data-table th:nth-child(11) {
+  display: none;
+}
+ #data-table td:nth-child(7),
+#data-table th:nth-child(7) {
+  display: none;
+}
+ #data-table td:nth-child(8),
+#data-table th:nth-child(8) {
+  display: none;
+}
+    .no-scroll {
+      overflow: hidden;
+    }
+  </style>
 <link type="text/css" href="/static/datatables/app.css" rel="stylesheet">
 {% endblock stylesheets %}
 
@@ -26,8 +55,8 @@
                     </svg>
                 </a>
             </li>
-            <li class="breadcrumb-item"><a href="#">Data Tables</a></li>
-            <li class="breadcrumb-item active" aria-current="page">File Conversion</li>
+            <li class="breadcrumb-item"><a href="/datatables">Upload_file</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Central Purchase</li>
         </ol>
     </nav>
     <div class="d-flex justify-content-between w-100 flex-wrap">
@@ -43,98 +72,431 @@
     </div>
 </div>
 
-
+<button class="btn btn-outline-gray-600 text-center" id="updateButton">Update</button>
 <div class="card mt-4 justify-content-center text-center">
     <div class="card-body">
-        <table id="data-table" class="table mx-auto" style="width: 100%;"></table>
+        <table id="data-table" class="table mx-auto" style="width: 100%;">
+              <thead>
+      <tr>
+        <!-- Generate table headers dynamically -->
+
+        {% for key in data[0].keys() %} <!-- Assume all dictionaries have the same keys -->
+          <th>{{ key }}</th>
+        {% endfor %}
+
+        <th><input class="no-scroll"  type="checkbox" id="selectAll">Select</th> <!-- Empty column for the checkbox -->
+        <th>Save As</th> <!-- Empty column for the button -->
+      </tr>
+    </thead>
+            <tbody>
+
+             {% for row in data %}
+      <tr>
+        {% for key, value in row.items() %}
+        <td>{{ value }}</td>
+        {% endfor %}
+<!--          <th><input  class="itempurchase" value=""   id="purchase_no_{{ loop.index }}" disabled></th>-->
+          <th><input type="checkbox" class="itemCheckbox" id="check_{{ loop.index }}" ></th>
+            <!-- Add button column with dynamic ID -->
+            <td><button class="btn btn-outline-gray-600 text-center itemButton "  data-row='{{ row | tojson }}'  id="button_{{ loop.index }}">Save&Approve</button></td>
+      </tr>
+      {% endfor %}
+            </tbody>
+
+
+
+        </table>
+
+
     </div>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest"></script>
 
+
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const data = {{ data| tojson | safe
-    }};
-
-    console.log(data);
-
-    const transformedData = {};
-
-    Object.entries(data).forEach(([key, value]) => {
-        const rowIndex = parseInt(key.split("[")[1]);
-        const colIndex = parseInt(key.split("[")[2]);
-
-        if (!transformedData[rowIndex]) {
-            transformedData[rowIndex] = {};
-        }
-
-        switch (colIndex) {
-            case 0:
-                transformedData[rowIndex].SI_Code = value;
-                break;
-            case 1:
-                transformedData[rowIndex].BR_Code = value;
-                break;
-            case 2:
-                transformedData[rowIndex].BR_Name = value;
-                break;
-            case 6:
-                transformedData[rowIndex].Supplier_Code = value;
-                break;
-            case 7:
-                transformedData[rowIndex].Supplier_Name = value;
-                break;
-            default:
-                break;
-        }
+document.addEventListener("DOMContentLoaded", function() {
+      new simpleDatatables.DataTable("#data-table");
     });
 
-    const dataArray = Object.values(transformedData);
-    const distinctSuppliers = {};
-    const itemCounts = {};
 
-    dataArray.forEach((row) => {
-        const supplierCode = row.Supplier_Code;
-        const supplierName = row.Supplier_Name;
-        if (!distinctSuppliers[supplierCode]) {
-            distinctSuppliers[supplierCode] = supplierName;
-        }
-        itemCounts[supplierCode] = (itemCounts[supplierCode] || 0) + 1;
+
+$(document).ready(function() {
+      // Initialize DataTable
+      var table = new simpleDatatables.DataTable('#data-table');
+
+      // Handle individual checkbox changes
+      $('.itemCheckbox').change(function() {
+        var allChecked = $('.itemCheckbox:checked').length === $('.itemCheckbox').length;
+        $('#selectAll').prop('checked', allChecked);
+      });
+
+      // Handle click on select all checkbox
+      $('#selectAll').click(function(event) {
+        event.stopPropagation();
+        var isChecked = $(this).prop('checked');
+        $('.itemCheckbox').prop('checked', isChecked).trigger('change');
+      });
+
+
+    // Restore select all checkbox state when navigating to a new page
+      table.on('datatable.page', function() {
+        $('#selectAll').prop('checked', selectAllChecked);
+      });
+
+       $('.itemButton').click(function() {
+       var jsonString = JSON.stringify($(this).data('row'));
+       var buttonId = $(this).attr("id");
+       var rowId = buttonId.split("_")[1];
+        var rowData = JSON.parse(jsonString);
+        console.log("hello");
+
+        sendRequest(rowData,buttonId);
+      });
+
+      function sendRequest(rowData,buttonId) {
+      console.log(rowData);
+<!--      console.log(rowId);-->
+<!--       var row = table.row($(this).closest('tr'));-->
+        $.ajax({
+          url: '/postingendpoint',
+          type: 'POST',
+          data: { 'rowData': JSON.stringify(rowData) },
+
+          success: function(response) {
+          console.log(response);
+<!--          insertIntoDatabase(response);-->
+          var updatedRowData = JSON.parse(response);
+
+          var rowId = buttonId.split("_")[1];
+          var rowElement = document.getElementById("data-table").getElementsByTagName("tbody")[0].getElementsByTagName("tr")[rowId - 1];
+          console.log(rowElement);
+
+
+            if (rowElement) {
+        // Update the row content manually
+        var cells = rowElement.getElementsByTagName('td');
+<!--         $('#purchase_no_' +rowData.sr_no ).val(rowData.purchase_no);-->
+
+        cells[11].innerText = updatedRowData.PurchaseOrderNo; // Assuming 'name' is the name column
+        document.getElementById(buttonId).disabled = true;
+        var checkid="check_"+rowId;
+        document.getElementById(checkid).disabled=true;
+
+        alert('Response updated successfully!');
+      } else {
+        console.log('Row not found in the DataTable.');
+      }
+          },
+          error: function (xhr, status, error) {
+      console.log('AJAX Error:', error);
+
+      // Check the status code and show an alert for specific errors
+      if (xhr.status === 400) {
+        alert('Error: Bad Request. Please check your data and try again.');
+      } else if (xhr.status === 500) {
+        alert('Error: Internal Server Error. Please try again later.');
+      } else {
+        alert('Error: Failed to update the data. Please try again later.');
+      }
+    }
+
+        });
+      }
+
+      function insertIntoDatabase(response) {
+  $.ajax({
+    url: '/insert-into-database',  // Replace with your server endpoint for database insertion
+    type: 'POST',
+    data: { 'response': JSON.stringify(response) },
+
+    success: function (databaseResponse) {
+      console.log('Data inserted into the database:', databaseResponse);
+    },
+    error: function (error) {
+      console.log('Error inserting data into the database:', error);
+    }
+  });
+}
+
+
+
+
+
     });
 
-    console.log(distinctSuppliers);
 
-    const mappedDataArray = dataArray.map((row) => {
-        const supplierCode = row.Supplier_Code;
-        const supplierName = distinctSuppliers[supplierCode];
-        return [
-            row.BR_Code,
-            row.BR_Name,
-            supplierCode,
-            supplierName,
-            itemCounts[supplierCode], // Update to use the item count
-            `<input type="checkbox" id="${supplierCode}">`,
-            '<button class="btn btn-outline-gray-600 text-center">Save & Approve</button>'
-        ];
-    });
 
-    const table = new simpleDatatables.DataTable("#data-table", {
-        data: {
-            headings: [
-                "BR_Code",
-                "BR_Name",
-                "Supplier_Code",
-                "Supplier_Name",
-                "Item_Count",
-                "Select",
-                ""
-            ],
-            data: mappedDataArray
-        }
-    });
+$(document).ready(function() {
+
+
+
+
+
+  $('#updateButton').click(function() {
+
+
+   var anyCheckboxChecked = $('.itemCheckbox:checked').length > 0;
+
+    // If no checkbox is checked, display an alert and prevent the update
+    if (!anyCheckboxChecked) {
+      alert('Please check at least one checkbox.');
+      return; // Exit the function to prevent the update
+    }
+
+    var selectedRows = [];
+
+
+
+
+
+<!--    $('.itemCheckbox:checked').each(function() {-->
+
+<!--      var rowData = $(this).closest('tr').find('.itemButton').data('row');-->
+
+<!--      selectedRows.push(rowData);-->
+<!--    });-->
+
+
+$('.itemCheckbox:checked').each(function() {
+  var closestRow = $(this).closest('tr');
+  console.log(closestRow);
+  var purchaseNoField = closestRow.find('td:eq(11)'); // Replace 'index' with the index of the purchase field within the row
+  var purchaseNo = purchaseNoField.text();
+  console.log(purchaseNo)
+
+  if (purchaseNo === '') {
+    var rowData = closestRow.find('.itemButton').data('row');
+    selectedRows.push(rowData);
+  }
 });
 
+    // Send selectedRows to the server using AJAX
+    $.ajax({
+      url: '/upload-endpoint', // Replace with your server endpoint
+      type: 'POST',
+      data: { 'selectedRows': JSON.stringify(selectedRows) },
+      success: function(response) {
+        updatePostingDetails(response);
+      },
+      error: function(error) {
+        console.error('Error:', error);
+      }
+    });
+  });
+
+  // Function to update posting details
+  function updatePostingDetails(response) {
+    // Assuming you have HTML elements to update
+    response.forEach(function(rowData, index) {
+
+    var rowId =rowData.sr_no ;
+          var rowElement = document.getElementById("data-table").getElementsByTagName("tbody")[0].getElementsByTagName("tr")[rowId - 1];
+          console.log(rowElement);
+
+
+            if (rowElement) {
+        // Update the row content manually
+        var cells = rowElement.getElementsByTagName('td');
+<!--         $('#purchase_no_' +rowData.sr_no ).val(rowData.purchase_no);-->
+console.log(cells)
+        cells[11].innerText = rowData.Purchase_Order_no; // Assuming 'name' is the name column
+<!--        document.getElementById(buttonId).disabled = true;-->
+        var checkid="check_"+rowId;
+        document.getElementById(checkid).disabled=true;
+         $('#check_' +rowData.sr_no ).prop('disabled',true);
+      $('#button_' + rowData.sr_no).prop('disabled', true);
+
+<!--        alert('Response updated successfully!');-->
+      }
+
+
+
+      $('#check_' +rowData.sr_no ).prop('disabled',true);
+      $('#button_' + rowData.sr_no).prop('disabled', true);
+
+      // Update other fields as needed
+    });
+  }
+
+});
+
+
+<!--$(document).ready(function() {-->
+<!--  var selectedRows = [];-->
+
+<!--  $('#updateButton').click(function() {-->
+<!--    if (selectedRows.length === 0) {-->
+<!--      alert('Please check at least one checkbox.');-->
+<!--      return; // Exit the function to prevent the update-->
+<!--    }-->
+
+<!--    // Send selectedRows to the server using AJAX-->
+<!--    $.ajax({-->
+<!--      url: '/upload-endpoint', // Replace with your server endpoint-->
+<!--      type: 'POST',-->
+<!--      data: { 'selectedRows': JSON.stringify(selectedRows) },-->
+<!--      success: function(response) {-->
+<!--        updatePostingDetails(response);-->
+<!--      },-->
+<!--      error: function(error) {-->
+<!--        console.error('Error:', error);-->
+<!--      }-->
+<!--    });-->
+<!--  });-->
+
+<!--  // Function to update posting details-->
+<!--  function updatePostingDetails(response) {-->
+<!--    // Assuming you have HTML elements to update-->
+<!--    response.forEach(function(rowData) {-->
+<!--      var rowId = rowData.sr_no;-->
+<!--      var rowElement = document.getElementById("data-table").getElementsByTagName("tbody")[0].getElementsByTagName("tr")[rowId - 1];-->
+
+<!--      if (rowElement) {-->
+<!--        // Update the row content manually-->
+<!--        var cells = rowElement.getElementsByTagName('td');-->
+<!--        cells[11].innerText = rowData.Purchase_Order_no;-->
+<!--        var checkid = "check_" + rowId;-->
+<!--        document.getElementById(checkid).disabled = true;-->
+<!--        $('#check_' + rowData.sr_no).prop('disabled', true);-->
+<!--        $('#button_' + rowData.sr_no).prop('disabled', true);-->
+<!--      }-->
+<!--    });-->
+<!--  }-->
+
+<!--  // Handle the "Select All" checkbox in the header-->
+<!--  $('#selectAll').click(function() {-->
+<!--    var isChecked = $(this).prop('checked');-->
+
+<!--    // Select/deselect checkboxes on all pages-->
+<!--    $('.itemCheckbox').prop('checked', isChecked);-->
+
+<!--    // Update selectedRows based on the checked checkboxes-->
+<!--    selectedRows = [];-->
+<!--    if (isChecked) {-->
+<!--      // Collect data for all checked checkboxes on all pages-->
+<!--      $('.itemCheckbox:checked').each(function() {-->
+<!--        var closestRow = $(this).closest('tr');-->
+<!--        var rowData = closestRow.find('.itemButton').data('row');-->
+<!--        console.log(rowData);-->
+<!--        selectedRows.push(rowData);-->
+<!--      });-->
+<!--    }-->
+<!--  });-->
+<!--});-->
+
+
+
+
+
+<!--document.addEventListener("DOMContentLoaded", function() {-->
+<!--  var table = document.getElementById("data-table");-->
+
+<!--  // Function to calculate and update the column sums in the footer-->
+<!--  function updateFooterSums() {-->
+<!--    var footer = table.tFoot;-->
+
+<!--    // Create the footer element and the footer row if they don't exist-->
+<!--    if (!footer) {-->
+<!--      footer = table.createTFoot();-->
+<!--    }-->
+<!--    var footerRow = footer.getElementsByTagName('tr')[0];-->
+<!--    if (!footerRow) {-->
+<!--      footerRow = footer.insertRow();-->
+<!--    }-->
+
+<!--    var columnSums = [];-->
+
+<!--    // Initialize column sums array-->
+<!--    for (var columnIndex = 0; columnIndex < table.rows[0].cells.length; columnIndex++) {-->
+<!--      columnSums.push(0);-->
+<!--    }-->
+
+<!--    table.querySelectorAll('tbody tr').forEach(function(row, rowIndex) {-->
+<!--      row.querySelectorAll('td').forEach(function(cell, columnIndex) {-->
+<!--        var cellData = cell.textContent;-->
+<!--        if (!isNaN(parseFloat(cellData))) {-->
+<!--          // Parse numeric values and accumulate in the column sums array-->
+<!--          columnSums[columnIndex] += parseFloat(cellData.replace(/\$/, '').replace(/,/g, ''));-->
+<!--        }-->
+<!--      });-->
+<!--    });-->
+
+<!--    // Update the footer cells with the calculated sums-->
+<!--    for (var columnIndex = 0; columnIndex < 11; columnIndex++) {-->
+
+<!--      var footerCell = footerRow.cells[columnIndex];-->
+<!--      if (!footerCell) {-->
+<!--        // Create a cell in the footer row if it doesn't exist-->
+<!--        footerCell = footerRow.insertCell();-->
+<!--      }-->
+
+<!-- footerCell.textContent = '$' + columnSums[columnIndex].toFixed(2);-->
+<!--    }-->
+<!--&lt;!&ndash;     footerCell.textContent = '$' + columnSums[columnIndex].toFixed(2);&ndash;&gt;-->
+<!--  }-->
+
+<!--  // Call the updateFooterSums function to calculate and display sums initially-->
+<!--  updateFooterSums();-->
+
+<!--  // Recalculate and update footer sums when the table is drawn-->
+<!--  table.addEventListener('datatable.init', updateFooterSums);-->
+<!--  table.addEventListener('datatable.page', updateFooterSums);-->
+<!--});-->
+
+
+document.addEventListener("DOMContentLoaded", function() {
+  var table = document.getElementById("data-table");
+  var defaultColumn = 9; // Set to 11 for column 11 (zero-based index)
+
+  // Function to calculate and update the sum of the default column in the footer
+  function updateFooterSum() {
+    var footer = table.tFoot;
+
+    // Create the footer element if it doesn't exist
+    if (!footer) {
+      footer = table.createTFoot();
+    }
+
+    // Create the footer row and cell for the default column if they don't exist
+    var footerRow = footer.getElementsByTagName('tr')[0];
+    if (!footerRow) {
+      footerRow = footer.insertRow();
+    }
+    var footerCell = footerRow.cells[0];
+    if (!footerCell) {
+      footerCell = footerRow.insertCell();
+    }
+
+    var columnSum = 0;
+
+    table.querySelectorAll('tbody tr').forEach(function(row) {
+      var cell = row.cells[defaultColumn];
+      var cellData = cell.textContent;
+      if (!isNaN(parseFloat(cellData))) {
+        // Parse numeric values and accumulate in the columnSum
+        columnSum += parseFloat(cellData.replace(/\$/, '').replace(/,/g, ''));
+      }
+    });
+
+    // Set the text content for the footer cell with the calculated sum
+    footerCell.textContent = '$' + columnSum.toFixed(2);
+  }
+
+  // Call the updateFooterSum function to calculate and display the sum initially
+  updateFooterSum();
+
+  // Recalculate and update the sum when the table is drawn
+  table.addEventListener('datatable.init', updateFooterSum);
+  table.addEventListener('datatable.page', updateFooterSum);
+});
+
+
+
+
+
+
 </script>
+
 {% endblock content %}

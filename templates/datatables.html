@@ -29,18 +29,28 @@
           </svg>
         </a>
       </li>
-      <li class="breadcrumb-item"><a href="#">Data Tables</a></li>
-      <li class="breadcrumb-item active" aria-current="page">File Provisioning</li>
+      <li class="breadcrumb-item"><a href="#">Upload_file</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Central Purchase</li>
     </ol>
   </nav>
   <div class="d-flex justify-content-between w-100 flex-wrap">
     <div class="mb-3 mb-lg-0">
       <h1 class="h4">Central Purchase Order</h1>
       <p class="mb-0">
-        The information is loaded from <strong>samples\{{ input }}</strong>.
+<!--        The information is loaded from <strong>samples\{{ input }}</strong>.-->
 
         <br />
-        {{ msg }}
+<!--        {{ msg }}-->
+      </p>
+    </div>
+    <div class="mb-3 mb-lg-0">
+     <a  href="/history_log" class="btn btn-outline-gray-600 text-center"> History
+        </a>
+      <p class="mb-0">
+<!--        The information is loaded from <strong>samples\{{ input }}</strong>.-->
+
+        <br />
+<!--        {{ msg }}-->
       </p>
     </div>
   </div>
@@ -48,6 +58,7 @@
   <div class="row mt-2">
     <div class="col-md-2">
       <select name="csv_file" id="csv_file" class="form-select csv_file">
+        <option value="" selected disabled>Select an option</option>
         {% for f in csv_files %}
         <option value="{{ f }}" {% if f==input %} selected {% endif %}>{{ f }}</option>
         {% endfor %}
@@ -55,15 +66,15 @@
     </div>
     <div class="col-md-4">
       <div class="mb-3">
-        <form method="post" enctype="multipart/form-data" action="/datatables" accept=".csv">
+        <form method="post"  action='/datatables' enctype="multipart/form-data"  accept=".csv">
           <div class="row">
             <div class="col-md-8">
-              <input type="file" id="fileInput" class="form-control">
+              <input type="file" id="file"  name="file" class="form-control">
 
             </div>
             <div class="col-md-4">
               <div class="d-grid">
-                <button class="btn btn-primary">Upload</button>
+                <button class="btn btn-primary" id="uploadBtn" >Upload</button>
               </div>
             </div>
           </div>
@@ -75,7 +86,9 @@
     </div>
     <div class="col-md-3">
       <div class="mb-4 mb-lg-0 d-grid">
-        <a target="_blank" class="btn btn-outline-gray-600 text-center" id="convertBtn">
+        <a href="/getconvert_fun" class="btn btn-outline-gray-600 text-center" id="convertBtn">
+<!--        <a href="/getconvert_fun"  target="_blank" class="btn btn-outline-gray-600 text-center" id="convertBtn">-->
+<!--          href="/getconvert_fun"-->
           <!-- <svg class="icon icon-xs me-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
             <path fill-rule="evenodd"
               d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z"
@@ -87,7 +100,7 @@
     </div>
     <div class="col-md-3">
       <div class="d-grid">
-        <a target="_blank" href="/getPlotCSV" class="btn btn-outline-gray-600 text-center">
+        <a  href="/getPlotCSV" class="btn btn-outline-gray-600 text-center">
           <!-- <svg class="icon icon-xs me-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
             <path fill-rule="evenodd"
               d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z"
@@ -97,12 +110,26 @@
         </a>
       </div>
     </div>
+
+<!--    <div class="col-md-3">-->
+<!--      <div class="d-grid">-->
+<!--        <a target="_blank" id="clearButton" class="btn btn-outline-gray-600 text-center">-->
+<!--          &lt;!&ndash; <svg class="icon icon-xs me-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">-->
+<!--            <path fill-rule="evenodd"-->
+<!--              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z"-->
+<!--              clip-rule="evenodd"></path>-->
+<!--          </svg> &ndash;&gt;-->
+<!--          Clear-->
+<!--        </a>-->
+<!--      </div>-->
+<!--    </div>-->
   </div>
 </div>
 
 <div class="card border-0 shadow mb-4">
 
   <div class="card-body">
+
 
     <table id="api-datatable" class="table">
       <!-- <thead>
@@ -146,125 +173,229 @@
   var table;
 
   // Table provisioning  
-  fetch('/api/from_csv?input={{ input }}')
-    .then(response => response.json())
-    .then(data => {
-      if (!data.length) {
-        return
-      }
-      table = new simpleDatatables.DataTable("#api-datatable", {
-        data: {
-          headings: Object.keys(data[0]),
-          data: data.map(item => Object.values(item))
-        },
-      })
-    })
+<!--  fetch('/api/from_csv?input={{ input }}')-->
+<!--    .then(response => response.json())-->
+<!--    .then(data => {-->
+<!--      if (!data.length) {-->
+<!--        return-->
+<!--      }-->
+<!--      table = new simpleDatatables.DataTable("#api-datatable", {-->
+<!--        data: {-->
+<!--          headings: Object.keys(data[0]),-->
+<!--          data: data.map(item => Object.values(item))-->
+<!--        },-->
+<!--      })-->
+<!--    })-->
+
+
+fetch('/api/from_csv?input={{ input }}')
+  .then(response => {
+    if (!response.ok) {
+      throw new Error(`Request failed with status ${response.status}`);
+    }
+    return response.json();
+  })
+  .then(data => {
+    if (!data.length) {
+      alert('Data upload not according to proper template or Any Special Character or Any duplicate Item_code corresponding Supplier.');
+      return;
+    }
+    table = new simpleDatatables.DataTable("#api-datatable", {
+      data: {
+        headings: Object.keys(data[0]),
+        data: data.map(item => Object.values(item))
+      },
+    });
+  })
+  .catch(error => {
+    alert('Error fetching data from the API: ' + error.message);
+    // You can also add additional error handling or user feedback here
+  });
 
 
 
-  // function handleConvertClick() {
-  //   const fileInput = document.getElementById('fileInput');
-  //   if (fileInput.files.length > 0) {
-  //     const file = fileInput.files[0];
-  //     const reader = new FileReader();
+  function handleConvertClick() {
+     const fileInput = document.getElementById('fileInput');
+     if (fileInput.files.length > 0) {
+      const file = fileInput.files[0];
+      const reader = new FileReader();
 
-  //     reader.onload = function (e) {
-  //       const data = new Uint8Array(e.target.result);
-  //       processSupplierTables();
-  //     };
+      reader.onload = function (e) {
+        const data = new Uint8Array(e.target.result);
+        processSupplierTables();
+       };
 
-  //     reader.readAsArrayBuffer(file);
-  //   } else {
-  //     toastr.error('Please select a file.', 'Error');
-  //   }
-  // }
+      reader.readAsArrayBuffer(file);
+     } else {
+       toastr.error('Please select a file.', 'Error');
+     }
+   }
 
-  function handleFileUpload(event) {
-    const file = event.target.files[0];
-    const reader = new FileReader();
 
-    reader.onload = function (e) {
-      const data = new Uint8Array(e.target.result);
-      processData(data);
-      // console.log('namsate')
-    };
+document.addEventListener('DOMContentLoaded', function () {
+  // Get the input file element and the "Upload" button
+  var fileInput = document.getElementById('file');
 
-    reader.readAsArrayBuffer(file);
-  }
+  var uploadBtn = document.getElementById('uploadBtn');
 
-  function processData(data) {
-    const workbook = XLSX.read(data, { type: 'array' });
-    const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-    const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-    const realJsonData = JSON.stringify(jsonData);
-    // console.log(realJsonData);
-    const transformedData = {};
-
-    for (let i = 2; i < jsonData.length; i++) {
-      transformedData[i - 1] = {
-        SI_Code: String(jsonData[i][0]),
-        BR_Code: String(jsonData[i][1]),
-        BR_Name: String(jsonData[i][2]),
-        Item: String(jsonData[i][3]),
-        Item_Name: String(jsonData[i][4]),
-        Order_Qty: String(jsonData[i][5]),
-        Supplier_Code: String(jsonData[i][6]),
-        Supplier_Name: String(jsonData[i][7]),
-      };
+  // Add click event listener to the "Upload" button
+  uploadBtn.addEventListener('click', function () {
+    // Check if a file is selected
+    if (!fileInput.files || fileInput.files.length === 0) {
+      alert('Please choose a file to upload.');
+      return;
     }
 
-    table.destroy();
-
-    const tableElement = document.querySelector("#api-datatable");
-
-    tableElement.innerHTML = "";
-
-    const tableHead = document.createElement("thead");
-    const headingRow = document.createElement("tr");
-
-    Object.keys(transformedData[1]).forEach((heading) => {
-      const th = document.createElement("th");
-      th.textContent = heading;
-      headingRow.appendChild(th);
-    });
-
-    tableHead.appendChild(headingRow);
-    tableElement.appendChild(tableHead);
-
-    const tableBody = document.createElement("tbody");
-
-    Object.values(transformedData).forEach((row) => {
-      const newRow = document.createElement("tr");
-      Object.values(row).forEach((cellData) => {
-        const newCell = document.createElement("td");
-        newCell.textContent = cellData;
-        newRow.appendChild(newCell);
-      });
-      tableBody.appendChild(newRow);
-    });
-
-    tableElement.appendChild(tableBody);
-    // table = new simpleDatatables.DataTable("#api-datatable");
-
-  }
-
-  $('#fileInput').change(handleFileUpload);
-
-
-  document.getElementById("convertBtn").addEventListener("click", function () {
-    const tableElement = document.getElementById("api-datatable");
-    const rows = tableElement.querySelectorAll("tbody tr");
-    const params = new URLSearchParams();
-    rows.forEach((row, index) => {
-      const cells = row.querySelectorAll("td");
-      cells.forEach((cell, cellIndex) => {
-        params.append(`data[${index}][${cellIndex}]`, cell.textContent);
-      });
-    });
-
-    const url = "/getconvert_fun?" + params.toString();
-    window.open(url, "_blank");
+    // If a file is selected, proceed with the upload action
+    // ... Your upload code here ...
   });
+});
+
+
+
+
+<!--        document.getElementById("convertBtn").addEventListener("click", function(event) {-->
+<!--            event.preventDefault();-->
+<!--            var input_value = document.getElementById("file").value;-->
+<!--            window.location.href = this.href + "/" + input_value;-->
+<!--        });-->
+
+
+
+<!--  function handleFileUpload(event) {-->
+<!--    const file = event.target.files[0];-->
+<!--    const reader = new FileReader();-->
+
+<!--    reader.onload = function (e) {-->
+<!--      const data = new Uint8Array(e.target.result);-->
+<!--      processData(data);-->
+<!--      // console.log('namsate')-->
+<!--    };-->
+
+<!--    reader.readAsArrayBuffer(file);-->
+<!--  }-->
+
+<!--  function processData(data) {-->
+<!--    const workbook = XLSX.read(data, { type: 'array' });-->
+<!--    const worksheet = workbook.Sheets[workbook.SheetNames[0]];-->
+<!--    const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });-->
+<!--    const realJsonData = JSON.stringify(jsonData);-->
+<!--    // console.log(realJsonData);-->
+<!--    const transformedData = {};-->
+
+<!--    for (let i = 2; i < jsonData.length; i++) {-->
+<!--      transformedData[i - 1] = {-->
+<!--        SI_Code: String(jsonData[i][0]),-->
+<!--        BR_Code: String(jsonData[i][1]),-->
+<!--        BR_Name: String(jsonData[i][2]),-->
+<!--        Item: String(jsonData[i][3]),-->
+<!--        Item_Name: String(jsonData[i][4]),-->
+<!--        Order_Qty: String(jsonData[i][5]),-->
+<!--        Supplier_Code: String(jsonData[i][6]),-->
+<!--        Supplier_Name: String(jsonData[i][7]),-->
+<!--      };-->
+<!--    }-->
+
+<!--    table.destroy();-->
+
+<!--    const tableElement = document.querySelector("#api-datatable");-->
+
+<!--    tableElement.innerHTML = "";-->
+
+<!--    const tableHead = document.createElement("thead");-->
+<!--    const headingRow = document.createElement("tr");-->
+
+<!--    Object.keys(transformedData[1]).forEach((heading) => {-->
+<!--      const th = document.createElement("th");-->
+<!--      th.textContent = heading;-->
+<!--      headingRow.appendChild(th);-->
+<!--    });-->
+
+<!--    tableHead.appendChild(headingRow);-->
+<!--    tableElement.appendChild(tableHead);-->
+
+<!--    const tableBody = document.createElement("tbody");-->
+
+<!--    Object.values(transformedData).forEach((row) => {-->
+<!--      const newRow = document.createElement("tr");-->
+<!--      Object.values(row).forEach((cellData) => {-->
+<!--        const newCell = document.createElement("td");-->
+<!--        newCell.textContent = cellData;-->
+<!--        newRow.appendChild(newCell);-->
+<!--      });-->
+<!--      tableBody.appendChild(newRow);-->
+<!--    });-->
+
+<!--    tableElement.appendChild(tableBody);-->
+<!--    // table = new simpleDatatables.DataTable("#api-datatable");-->
+
+<!--  }-->
+
+<!--  $('#fileInput').change(handleFileUpload);-->
+
+
+<!--  document.getElementById("convertBtn").addEventListener("click", function () {-->
+<!--    const tableElement = document.getElementById("api-datatable");-->
+<!--    const rows = tableElement.querySelectorAll("tbody tr");-->
+<!--    const params = new URLSearchParams();-->
+<!--    rows.forEach((row, index) => {-->
+<!--      const cells = row.querySelectorAll("td");-->
+<!--      cells.forEach((cell, cellIndex) => {-->
+<!--        params.append(`data[${index}][${cellIndex}]`, cell.textContent);-->
+<!--      });-->
+<!--    });-->
+
+<!--    const url = "/getconvert_fun?" + params.toString();-->
+<!--    window.open(url, "_blank");-->
+<!--  });-->
+
+<!--$(document).ready(function() {-->
+<!--    $('#convertBtn').click(function() {-->
+<!--    console.log($('#csv_file').val());-->
+<!--      var inputValue = $('#csv_file').val();-->
+
+<!--      console.log(inputValue);-->
+<!--      sendRequest(inputValue);-->
+<!--    });-->
+
+<!--    function sendRequest(value) {-->
+<!--      $.ajax({-->
+<!--        url: '/getconvert_fun',-->
+<!--        method: 'GET',-->
+<!--        data: { 'inputValue': value },-->
+<!--        success: function(response) {-->
+<!--          console.log('exx',response);-->
+<!--&lt;!&ndash;          window.location.href = '/result'&ndash;&gt;-->
+
+<!--          window.location.href = '/convert_datatable?data=' + encodeURIComponent(JSON.stringify(data));-->
+<!--        },-->
+<!--        error: function(error) {-->
+<!--          console.log(error);-->
+<!--        }-->
+<!--      });-->
+<!--    }-->
+<!--  });-->
+
+
+<!-- $(document).ready(function() {-->
+<!--    table = new simpleDatatables.DataTable('#api-datatable');-->
+
+
+<!--    $('#clearButton').click(function() {-->
+<!--      clearTable();-->
+<!--    });-->
+
+<!--    // Function to clear the table-->
+<!--    function clearTable() {-->
+<!--     var tbody = document.querySelector('#api-datatable tbody');-->
+<!--      while (tbody.firstChild) {-->
+<!--        tbody.removeChild(tbody.firstChild);-->
+<!--      }-->
+<!--    }-->
+<!--    }-->
+<!--  });-->
+
+
 
 
 
