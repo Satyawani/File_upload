@@ -6,15 +6,50 @@
 {% block stylesheets %}
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet" type="text/css">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet" type="text/css">
 <!-- <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css"> -->
 
 <!-- APP Style -->
 <link type="text/css" href="/static/datatables/app.css" rel="stylesheet">
 <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+<style>
+  footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    /* background-color: red;
+  color: white; */
+    text-align: center;
+  }
+
+  #overlay {
+      position: fixed;
+      display: none;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 9999;
+      top: 0;
+      left: 0;
+      justify-content: center;
+      align-items: center;
+    }
+    .spinner {
+      font-size: 40px;
+      color: white;
+    }
+</style>
 
 {% endblock stylesheets %}
 
 {% block content %}
+
+<div id="overlay">
+  <div class="spinner">
+    <i class="fas fa-spinner fa-spin"></i>
+  </div>
+</div>
 
 <div class="py-4">
   <nav aria-label="breadcrumb" class="d-none d-md-inline-block">
@@ -171,6 +206,7 @@
 <script>
 
   var table;
+  var overlay = document.getElementById('overlay');
 
   // Table provisioning  
 <!--  fetch('/api/from_csv?input={{ input }}')-->
@@ -196,6 +232,7 @@ fetch('/api/from_csv?input={{ input }}')
     return response.json();
   })
   .then(data => {
+    overlay.style.display = 'none';
     if (!data.length) {
       alert('Data upload not according to proper template or Any Special Character or Any duplicate Item_code corresponding Supplier.');
       return;
@@ -208,6 +245,7 @@ fetch('/api/from_csv?input={{ input }}')
     });
   })
   .catch(error => {
+    overlay.style.display = 'none';
     alert('Error fetching data from the API: ' + error.message);
     // You can also add additional error handling or user feedback here
   });
@@ -240,9 +278,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Add click event listener to the "Upload" button
   uploadBtn.addEventListener('click', function () {
+    overlay.style.display = 'flex';
     // Check if a file is selected
     if (!fileInput.files || fileInput.files.length === 0) {
       alert('Please choose a file to upload.');
+      overlay.style.display = 'none';
       return;
     }
 
