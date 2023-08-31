@@ -18,67 +18,63 @@
     z-index: 1;
   } */
 
-  footer {
+  /* footer {
     position: fixed;
     left: 0;
     bottom: 0;
     width: 100%;
-    /* background-color: red;
-  color: white; */
+    text-align: center;
+  } */
+
+
+  #updateButton {
+    display: block;
+    width: 100%;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    padding: 14px 28px;
+    font-size: 16px;
+    cursor: pointer;
     text-align: center;
   }
-</style>
 
-#updateButton {
-display: block;
-width: 100%;
-/* border: none; */
-/* background-color: #04AA6D; */
-margin-top: 15px;
-margin-bottom: 15px;
-padding: 14px 28px;
-font-size: 16px;
-cursor: pointer;
-text-align: center;
-}
+  .d-grid {
+    display: grid !important;
+  }
 
-.d-grid {
-display: grid !important;
-}
+  #data-table td:nth-child(3),
+  #data-table th:nth-child(3) {
+    display: none;
+  }
 
-#data-table td:nth-child(3),
-#data-table th:nth-child(3) {
-display: none;
-}
+  #data-table td:nth-child(4),
+  #data-table th:nth-child(4) {
+    display: none;
+  }
 
-#data-table td:nth-child(4),
-#data-table th:nth-child(4) {
-display: none;
-}
+  #data-table td:nth-child(9),
+  #data-table th:nth-child(9) {
+    display: none;
+  }
 
-#data-table td:nth-child(9),
-#data-table th:nth-child(9) {
-display: none;
-}
+  #data-table td:nth-child(11),
+  #data-table th:nth-child(11) {
+    display: none;
+  }
 
-#data-table td:nth-child(11),
-#data-table th:nth-child(11) {
-display: none;
-}
+  #data-table td:nth-child(7),
+  #data-table th:nth-child(7) {
+    display: none;
+  }
 
-#data-table td:nth-child(7),
-#data-table th:nth-child(7) {
-display: none;
-}
+  #data-table td:nth-child(8),
+  #data-table th:nth-child(8) {
+    display: none;
+  }
 
-#data-table td:nth-child(8),
-#data-table th:nth-child(8) {
-display: none;
-}
-
-.no-scroll {
-overflow: hidden;
-}
+  .no-scroll {
+    overflow: hidden;
+  }
 </style>
 <!-- <link type="text/css" href="/static/datatables/app.css" rel="stylesheet"> -->
 {% endblock stylesheets %}
@@ -158,7 +154,7 @@ overflow: hidden;
 <!-- <div class="row">
   <div class="d-grid"> -->
 <!-- <div class="col-md-12"> -->
-<button class="btn btn-outline-gray-600 text-center" id="updateButton">Update</button>
+<button class="btn btn-primary text-center" id="updateButton">Update</button>
 <!-- </div>
   </div>
 </div> -->
