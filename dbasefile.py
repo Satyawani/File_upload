@@ -78,7 +78,7 @@ def item_wise_eff_pur(code):
 def file_with_supp_item(file):
     try:
         df=pd.read_csv(rf'samples/{file}',skipinitialspace = True,converters={"item_code":str,"br_code":str})
-        print(df.dtypes)
+        # print(df.dtypes)
         # df['item_code']=df['item_code'].astype('str')
         # df['br_code'] = df['br_code'].astype('str')
         # df['supplier_code'] = df['supplier_code'].apply(clean_text)
@@ -99,39 +99,39 @@ def file_with_supp_item(file):
         itm_code=item_master(item_code)
         sup_code = supp_master(supp_code)
         br_code = br_master(br_code)
-        print('brcode_1',br_code)
+        # print('brcode_1',br_code)
         rate = item_wise_eff_pur(item_code)
-        print('List',itm_code,'filee',sup_code,'br_code',br_code,rate)
+        # print('List',itm_code,'filee',sup_code,'br_code',br_code,rate)
         data_item={}
         for i in itm_code:
-            print(i['c_code'],i['c_name'])
+            # print(i['c_code'],i['c_name'])
             data_item[i['c_code']]=i['c_name']
 
-        print(data_item,'item')
+        # print(data_item,'item')
         data_sup={}
         for i in sup_code:
-            print(i['c_code'], i['c_name'])
+            # print(i['c_code'], i['c_name'])
             data_sup[i['c_code']]=i['c_name']
 
         data_br = {}
         for i in br_code:
-            print(i['c_code'], i['c_name'])
+            # print(i['c_code'], i['c_name'])
             data_br[i['c_code']] = i['c_name']
 
         data_rate = {}
         for i in rate:
-            print(i['c_item_code'], i['n_eff_pur_rate'])
+            # print(i['c_item_code'], i['n_eff_pur_rate'])
             data_rate[i['c_item_code']] = i['n_eff_pur_rate']
-        print(data_rate, 'item')
+        # print(data_rate, 'item')
 
         data_qty_per_box = {}
         for i in itm_code:
             print(i['c_code'], i['n_qty_per_box'])
             data_qty_per_box[i['c_code']] = i['n_qty_per_box']
-        print(data_qty_per_box, 'item')
+        # print(data_qty_per_box, 'item')
 
         # print(data_sup, 'supp')
-        print(data_br,'br')
+        # print(data_br,'br')
         df['item_code']=df['item_code'].astype('str')
         df['br_code'] = df['br_code'].astype('str')
         df['Supplier_name']=df['supplier_code'].map(data_sup)
@@ -141,10 +141,10 @@ def file_with_supp_item(file):
         df['qty_per_box'] = df['item_code'].map(data_qty_per_box)
         df['qty_calc'] =df['qty_per_box']*df['qty']
         df['rate'][df['rate'].isna()==True]=0
-        print(df['rate'])
+        # print(df['rate'])
         df['line_level_rate']=df['rate']*df['qty_per_box']
         df['total']=df['line_level_rate']*df['qty']
-        print(df['rate'])
+        # print(df['rate'])
         df=df[['br_code','Branch_name','supplier_code','Supplier_name','item_code','Item_name','qty','line_level_rate','qty_calc','total']]
         df.to_csv("samples/data.csv")
         # df.to_csv('data.csv',index=False)
@@ -191,8 +191,8 @@ def convert_supp_item_count(file):
     #total_sum=('total', 'sum')
 
 
-    print(df)
-    print(df['item_Details'])
+    # print(df)
+    # print(df['item_Details'])
     # Create a new DataFrame to hold the split rows
     # Create a new DataFrame to hold the split rows
     split_df = pd.DataFrame(columns=df.columns)
@@ -277,7 +277,7 @@ def convert_supp_item_count(file):
     split_df['total_sum'] = split_df['total_sum'].round(2)
     split_df['sr_no'] = range(1, len(split_df) + 1)
     split_df['Purchase_Order_no'] =''
-    print(split_df)# # Apply the function to the column
+    # print(split_df)# # Apply the function to the column
     # df['item_Details'] = df['item_Details'].apply(split_lists)
     #
     # df = df.explode('item_Details').reset_index(drop=True)

@@ -168,17 +168,23 @@
 
 
 <script>
-  // document.addEventListener("DOMContentLoaded", function() {
-  // var table = new simpleDatatables.DataTable("#data-table");
-  // var table = $('#data-table').DataTable();
-  // });
-  // var table  = $("#dataTable").simpleDataTable({ pagination: false });
-  var table = new simpleDatatables.DataTable("#data-table", {
+   document.addEventListener("DOMContentLoaded", function() {
+   var table = new simpleDatatables.DataTable("#data-table", {
     // perPage: 100000,
     // fixedHeight: true,
     paging: false,
     scrollY: '550px',
   });
+
+   });
+  // var table  = $("#data-table").simpleDataTable({ pagination: false });
+
+<!--  var table = new simpleDatatables.DataTable("#data-table", {-->
+<!--    // perPage: 100000,-->
+<!--    // fixedHeight: true,-->
+<!--    paging: false,-->
+<!--    scrollY: '550px',-->
+<!--  });-->
 
 
 
@@ -199,9 +205,9 @@
 
 
     // Restore select all checkbox state when navigating to a new page
-    table.on('datatable.page', function () {
-      $('#selectAll').prop('checked', selectAllChecked);
-    });
+<!--    table.on('datatable.page', function () {-->
+<!--      $('#selectAll').prop('checked', selectAllChecked);-->
+<!--    });-->
 
     $('.itemButton').click(function () {
       var jsonString = JSON.stringify($(this).data('row'));
@@ -228,7 +234,9 @@
           var updatedRowData = JSON.parse(response);
 
           var rowId = buttonId.split("_")[1];
-          var rowElement = document.getElementById("data-table").getElementsByTagName("tbody")[0].getElementsByTagName("tr")[rowId - 1];
+          console.log(document.querySelector("#data-table tbody").getElementsByTagName("tr")[rowId - 1]);
+
+          var rowElement = document.querySelector("#data-table tbody").getElementsByTagName("tr")[rowId - 1];
           console.log(rowElement);
 
 
@@ -352,7 +360,9 @@
       response.forEach(function (rowData, index) {
 
         var rowId = rowData.sr_no;
-        var rowElement = document.getElementById("data-table").getElementsByTagName("tbody")[0].getElementsByTagName("tr")[rowId - 1];
+        console.log('rowid',rowId);
+<!--        console.log( document.getElementById("data-table").getElementsByTagName("tbody")[0]);-->
+        var rowElement = document.querySelector("#data-table tbody").getElementsByTagName("tr")[rowId - 1];
         console.log(rowElement);
 
 
