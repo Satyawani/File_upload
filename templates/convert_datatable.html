@@ -5,6 +5,7 @@
 {% block stylesheets %}
 <!-- Specific Page CSS goes HERE -->
 <link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet" type="text/css">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet" type="text/css">
 <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous"> -->
 <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css">
@@ -25,6 +26,24 @@
     width: 100%;
     text-align: center;
   } */
+
+  #overlay {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 9999;
+}
+
+.spinner {
+  font-size: 40px;
+  color: white;
+}
 
 
   #updateButton {
@@ -80,6 +99,12 @@
 {% endblock stylesheets %}
 
 {% block content %}
+
+<div id="overlay">
+  <div class="spinner">
+    <i class="fas fa-spinner fa-spin"></i>
+  </div>
+</div>
 
 <div class="pt-4 pb-2">
   <nav aria-label="breadcrumb" class="d-none d-md-inline-block px-1">
@@ -179,12 +204,12 @@
    });
   // var table  = $("#data-table").simpleDataTable({ pagination: false });
 
-<!--  var table = new simpleDatatables.DataTable("#data-table", {-->
-<!--    // perPage: 100000,-->
-<!--    // fixedHeight: true,-->
-<!--    paging: false,-->
-<!--    scrollY: '550px',-->
-<!--  });-->
+// <!--  var table = new simpleDatatables.DataTable("#data-table", {-->
+// <!--    // perPage: 100000,-->
+// <!--    // fixedHeight: true,-->
+// <!--    paging: false,-->
+// <!--    scrollY: '550px',-->
+// <!--  });-->
 
 
 
@@ -296,7 +321,7 @@
   $(document).ready(function () {
 
 
-
+    $('#overlay').hide();
 
 
     $('#updateButton').click(function () {
@@ -309,6 +334,8 @@
         alert('Please check at least one checkbox.');
         return; // Exit the function to prevent the update
       }
+
+      $('#overlay').show();
 
       var selectedRows = [];
 
@@ -346,9 +373,11 @@
         type: 'POST',
         data: { 'selectedRows': JSON.stringify(selectedRows) },
         success: function (response) {
+          $('#overlay').hide();
           updatePostingDetails(response);
         },
         error: function (error) {
+          $('#overlay').hide();
           console.error('Error:', error);
         }
       });
