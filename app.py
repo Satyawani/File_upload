@@ -12,7 +12,7 @@ import shutil
 from datetime import *
 from dbasefile import *
 # import Flask
-from flask import Flask, render_template, send_from_directory, request, flash, redirect, Response,jsonify,url_for
+from flask import Flask, render_template, send_from_directory, request, flash, redirect, Response,jsonify,url_for,session
 import requests
 from util import csv_to_json, list_csv_files, get_tail, get_date_ms
 
@@ -79,6 +79,7 @@ def admin12():
         b=cur.fetchall()
         print('count',len(b))
         if len(b) == 1:
+            session['username'] = uname
             return render_template('datatables.html')
         else:
             return render_template('sign-in.html')
@@ -101,10 +102,10 @@ def sign_out():
 
 @app.route("/getconvert_fun" ,methods=['GET'])
 def getconvert_fun():
-    print('convert_screen')
+    print('convert_screen',session['username'])
     input = request.form.get('file')
-    print(input)
-    print(type(input),f"samples/".join({str(input)}))
+    # print(input)
+    # print(type(input),f"samples/".join({str(input)}))
     #
     df=pd.read_csv(rf"samples/data.csv")
     # df=pd.read_csv(rf"data.csv")
@@ -112,7 +113,7 @@ def getconvert_fun():
     df=convert_supp_item_count(df)
 
     data=df.to_dict('records')
-    print('file',data)
+    # print('file',data)
     # print(data)
     # data = request.args.to_dict()
     # print(jsonify(data))
@@ -124,9 +125,9 @@ def getconvert_fun():
 @app.route('/result/<data>')
 def result():
     data = request.args.getlist('data')
-    print('edf',data)
+    # print('edf',data)
     data= [ast.literal_eval(data[0])]
-    print('3ada',data)
+    # print('3ada',data)
     return render_template('convert_datatable.html', data=data)
 
 
@@ -264,8 +265,8 @@ def endpoint():
         item_id = request.form.get('rowData')
         item_id=ast.literal_eval(item_id)
         a=[]
-        print(item_id)
-        print(type(item_id['item_Details']),item_id['item_Details'])
+        # print(item_id)
+        # print(type(item_id['item_Details']),item_id['item_Details'])
         for i in range(0,len(item_id['item_Details'])):
 
 
@@ -281,7 +282,7 @@ def endpoint():
         }
         json_list['itemlist']=a
 
-        print(json_list)
+        # print(json_list)
         headers = {'Content-type': 'application/json'}
 
         # res_1=requests.post(post_url+json.dumps(json_list), timeout=2.50)
@@ -289,7 +290,7 @@ def endpoint():
         # res_1={'code': '400', 'Status': 'Success', 'Message': 'Order Created Successfully', 'PurchaseOrderNo': '503/23/O/10295'}
         #
         res_1 = requests.post(post_url+json.dumps(json_list), timeout=2.50, headers=headers)
-        print(res_1.json())
+        # print(res_1.json())
         # a = json.dumps({'code': '200', 'Status': 'Success', 'Message': 'Order Created Successfully', 'PurchaseOrderNo': '503/23/O/15516'})
 
         a =res_1.json()
@@ -312,12 +313,12 @@ def endpoint():
             for i in datafile:
                 final_data_value.append(str(i))
 
-            print('values',final_data_value)
+            # print('values',final_data_value)
 
             query = "INSERT INTO central_purchase_order(c_br_code,n_item_count,item_Details,n_pack_qty,qty_value,rate_Details,c_supp_code,c_supplier_name,n_rate_sum,c_purchase_order_no,c_status,c_message,d_date) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
-            print(query, final_data_value)
+            # print(query, final_data_value)
             fet=cur.execute(query,final_data_value)
-            print(fet)
+            # print(fet)
             cn.commit()
             cn.close()
         except Exception as e:
@@ -379,29 +380,37 @@ def process_selected_rows(selected_rows):
         }
         json_list['itemlist'] = a
 
-        print('edr',json_list)
+        # print('edr',json_list)
         headers = {'Content-type': 'application/json'}
-        print(post_url + json.dumps(json_list))
+        # print(post_url + json.dumps(json_list))
+
         res_1 = requests.post(post_url + json.dumps(json_list), timeout=2.50, headers=headers)
-        print(res_1.json())
+        # print(res_1.json())
         # a=json.loads(res_1.json())
-        print(res_1.json(),type(res_1.json()))
+        # print(res_1.json(),type(res_1.json()))
 
         res_1=res_1.json()
-
+        if res_1['code']=='200':
         # Update posting details and create an updated row
-        updated_row = {
-            # 'purchase_no': row['purchase_no'],  # Assuming this key exists in row data
-            'sr_no':item_id['sr_no'],
-            'Purchase_Order_no':res_1['PurchaseOrderNo']
-            # Add other fields as needed
-        }
+            updated_row = {
+                # 'purchase_no': row['purchase_no'],  # Assuming this key exists in row data
+                'sr_no':item_id['sr_no'],
+                'Purchase_Order_no':res_1['PurchaseOrderNo']
+                # Add other fields as needed
+            }
+        else:
+            updated_row = {
+                # 'purchase_no': row['purchase_no'],  # Assuming this key exists in row data
+                'sr_no': item_id['sr_no'],
+                'Purchase_Order_no': res_1['Message']
+                # Add other fields as needed
+            }
 
         # print(updated_row)
 
         updated_data.append(updated_row)
         try:
-            print(res_1['PurchaseOrderNo'])
+            # print(res_1['PurchaseOrderNo'])
             cn,cur=dbfun()
             item_id['Purchase_Order_no']=res_1['PurchaseOrderNo']
             item_id['Status'] = res_1['Status']
@@ -411,16 +420,16 @@ def process_selected_rows(selected_rows):
             del item_id['sr_no']
             # print(item_id)
             datafile=item_id.values()
-            print(datafile)
+            # print(datafile)
 
             final_data_value=[]
             for i in datafile:
                 final_data_value.append(str(i))
 
-            print('data',final_data_value)
+            # print('data',final_data_value)
 
             query = "INSERT INTO central_purchase_order(c_purchase_order_no,c_br_code,n_item_count,item_Details,n_pack_qty,qty_value,rate_Details,c_supp_code,c_supplier_name,n_rate_sum,c_status,c_message,d_date) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
-            print(query, final_data_value)
+            # print(query, final_data_value)
             fet=cur.execute(query,final_data_value)
             # print(fet)
             cn.commit()
@@ -428,6 +437,13 @@ def process_selected_rows(selected_rows):
         except Exception as e:
             print(e)
         # print("hello",updated_data)
+        # updated_data=[{
+        #
+        #         'sr_no':item_id['sr_no'],
+        #         'Purchase_Order_no':'23234243'
+        #         # Add other fields as needed
+        #     }]
+    print(updated_data)
     return updated_data
 
 
