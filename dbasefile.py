@@ -271,7 +271,7 @@ def convert_supp_item_count(file):
             row['total_sum'] = sum(total)
             row['rate_Details'] = rate
             row['qty_value'] = qty_valu
-            split_df = split_df._append(row, ignore_index=True)
+            split_df = split_df.append(row, ignore_index=True)
     # ...
 
     split_df['total_sum'] = split_df['total_sum'].round(2)
