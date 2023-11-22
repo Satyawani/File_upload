@@ -462,6 +462,10 @@ def upload_endpoint():
         return jsonify(updated_data)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+    
+@app.route('/form')
+def form():
+    return render_template('form.html')
 
 
 
